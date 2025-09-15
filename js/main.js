@@ -14,6 +14,22 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    function getSearchQuery() {
+        return inputBuscar.value.trim().toLowerCase();
+    }
+
+    function filterMovies(movies) {
+        const query = getSearchQuery();
+        if (!query) return movies;
+        return movies.filter(movie => {
+            const matchTitle = movie.title.toLowerCase().includes(query);
+            const matchTagline = movie.tagline && movie.tagline.toLowerCase().includes(query);
+            const matchOverview = movie.overview && movie.overview.toLowerCase().includes(query);
+            const matchGenres = movie.genres && movie.genres.some(genre => genre.name.toLowerCase().includes(query));
+            return matchTitle || matchTagline || matchOverview || matchGenres;
+        });
+    }
+
     function displayMovies(movies) {
         lista.innerHTML = '';
         movies.forEach(movie => {
@@ -43,7 +59,16 @@ document.addEventListener('DOMContentLoaded', function () {
     btnBuscar.addEventListener('click', async () => {
         const movies = await getMoviesList();
         if (movies) {
-            displayMovies(movies);
+            const filteredMovies = filterMovies(movies);
+            displayMovies(filteredMovies);
+        }
+    });
+
+    inputBuscar.addEventListener('input', async () => {
+        const movies = await getMoviesList();
+        if (movies) {
+            const filteredMovies = filterMovies(movies);
+            displayMovies(filteredMovies);
         }
     });
 
