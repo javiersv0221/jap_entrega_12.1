@@ -1,8 +1,11 @@
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', async function () {
     const API_URL = "https://japceibal.github.io/japflix_api/movies-data.json";
     const inputBuscar = document.getElementById('inputBuscar');
     const btnBuscar = document.getElementById('btnBuscar');
     const lista = document.getElementById('lista');
+
+    // Inicializar con parámetro de búsqueda de la URL
+    const urlParams = new URLSearchParams(window.location.search);
 
     async function getMoviesList() {
         try {
@@ -15,7 +18,21 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function getSearchQuery() {
+        const searchParam = urlParams.get('search');
+        if (searchParam) return searchParam.trim().toLowerCase();
         return inputBuscar.value.trim().toLowerCase();
+    }
+
+    function updateSearchParam(query) {
+        const url = new URL(window.location);
+        if (query) {
+            url.searchParams.set('search', query);
+        } else {
+            url.searchParams.delete('search');
+        }
+
+        // Reemplaza la URL en la barra del navegador sin recargar y sin agregar el cambio al historial.
+        window.history.replaceState({}, '', url);
     }
 
     function filterMovies(movies) {
@@ -53,7 +70,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>
             `;
 
-            listItem.addEventListener('click', function() {
+            listItem.addEventListener('click', function () {
                 showMovieDetails(movie);
             });
 
@@ -101,20 +118,20 @@ document.addEventListener('DOMContentLoaded', function () {
         offcanvas.show();
     }
 
-    btnBuscar.addEventListener('click', async () => {
+    async function executeSearch() {
         const movies = await getMoviesList();
         if (movies) {
+            const query = inputBuscar.value.trim();
+            updateSearchParam(query);
             const filteredMovies = filterMovies(movies);
             displayMovies(filteredMovies);
         }
-    });
+    }
 
-    inputBuscar.addEventListener('input', async () => {
-        const movies = await getMoviesList();
-        if (movies) {
-            const filteredMovies = filterMovies(movies);
-            displayMovies(filteredMovies);
-        }
-    });
+    btnBuscar.addEventListener('click', executeSearch);
 
+    inputBuscar.addEventListener('input', executeSearch);
+
+    inputBuscar.value = getSearchQuery();
+    await executeSearch();
 });
