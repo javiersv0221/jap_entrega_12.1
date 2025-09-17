@@ -63,7 +63,8 @@ document.addEventListener('DOMContentLoaded', async function () {
             const movieTagline = movie.tagline;
             const voteAverage = movie.vote_average;
             const starsGold = Math.floor(voteAverage / 2);
-            const starsWhite = 5 - starsGold;
+            const hasHalfStar = (voteAverage / 2) % 1 >= 0.5;
+            const starsWhite = 5 - starsGold - (hasHalfStar ? 1 : 0);
 
             const listItem = document.createElement('li');
             listItem.className = 'list-group-item bg-dark text-white mb-2';
@@ -74,7 +75,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                         <p class="text-muted mb-1 fst-italic">${movieTagline ?? 'No hay descripción disponible'}</p>
                     </div>
                     <div class="text-end">
-                        ${'<span class="fa fa-star checked"></span>'.repeat(starsGold)}${'<span class="fa fa-star"></span>'.repeat(starsWhite)}
+                        ${'<span class="fa fa-star checked"></span>'.repeat(starsGold)}${hasHalfStar ? '<span class="fa fa-star-half-o checked"></span>' : ''}${'<span class="fa fa-star"></span>'.repeat(starsWhite)}
                     </div>
                 </div>
             `;
