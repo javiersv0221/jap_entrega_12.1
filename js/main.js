@@ -4,13 +4,22 @@ document.addEventListener('DOMContentLoaded', async function () {
     const btnBuscar = document.getElementById('btnBuscar');
     const lista = document.getElementById('lista');
 
+    // Guarda en caché los datos obtenidos de la API
+    let moviesCache = [];
+
     // Inicializar con parámetro de búsqueda de la URL
     const urlParams = new URLSearchParams(window.location.search);
 
     async function getMoviesList() {
         try {
+            if (moviesCache.length) return moviesCache;
             const response = await fetch(API_URL);
-            return await response.json();
+            if (!response.ok) {
+                console.error(`HTTP error - status: ${response.status}`);
+                return null;
+            }
+            moviesCache = await response.json();
+            return moviesCache;
         } catch (error) {
             console.error('Error al obtener los datos:', error);
             return null;
