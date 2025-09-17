@@ -52,8 +52,53 @@ document.addEventListener('DOMContentLoaded', function () {
                     </div>
                 </div>
             `;
+
+            listItem.addEventListener('click', function() {
+                showMovieDetails(movie);
+            });
+
             lista.appendChild(listItem);
         });
+    }
+
+    /**
+     * Función para mostrar detalles de la película en un offcanvas
+     * @param movie {Object} - Objeto de la película cuyos detalles se mostrarán
+     */
+    function showMovieDetails(movie) {
+
+        const offcanvasElement = document.getElementById('movieOffcanvas');
+        const offcanvas = new bootstrap.Offcanvas(offcanvasElement);
+
+        // Actualizar contenido del offcanvas
+        document.getElementById('offcanvasMovieTitle').textContent = movie.title;
+        document.getElementById('offcanvasMovieOverview').textContent = movie.overview || 'Sinopsis no disponible';
+
+        const genresList = document.getElementById('offcanvasMovieGenres');
+        genresList.innerHTML = '';
+
+        if (movie.genres && movie.genres.length > 0) {
+            movie.genres.forEach(genre => {
+                const genreSpan = document.createElement('span');
+                genreSpan.className = 'badge bg-primary me-2 mb-2';
+                genreSpan.textContent = genre.name;
+                genresList.appendChild(genreSpan);
+            });
+        } else {
+            genresList.innerHTML = '<span class="text-muted">Géneros no disponibles</span>';
+        }
+
+        const releaseYear = movie.release_date ? new Date(movie.release_date).getFullYear() : '-';
+        const runtime = movie.runtime ? `${movie.runtime} minutos` : '-';
+        const budget = movie.budget ? `${movie.budget.toLocaleString()}` : '-';
+        const revenue = movie.revenue ? `${movie.revenue.toLocaleString()}` : '-';
+
+        document.getElementById('movieYear').textContent = releaseYear;
+        document.getElementById('movieRuntime').textContent = runtime;
+        document.getElementById('movieBudget').textContent = budget;
+        document.getElementById('movieRevenue').textContent = revenue;
+
+        offcanvas.show();
     }
 
     btnBuscar.addEventListener('click', async () => {
